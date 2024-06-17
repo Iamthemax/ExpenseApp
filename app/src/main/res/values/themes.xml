@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MyExpenseApp" parent="Theme.Material3.Light.NoActionBar">
+         <item name="colorPrimary">#2196F3</item>
+         <item name="colorPrimaryDark">#0877CF</item>
+        <!-- Customize your light theme here. -->
+    </style>
+
+    <style name="Theme.MyExpenseApp" parent="Base.Theme.MyExpenseApp" />
+</resources>
