@@ -83,10 +83,14 @@ public class ExpenseListFragment extends Fragment {
         {
             dbHelper.insertCategory("Default");
         }
-        Log.d("mytag",""+dbHelper.getSum());
+        if(expenseArrayList.size()>=1)
+        {
+               Log.d("mytag",""+dbHelper.getSum());
         Log.d("mytag",""+dbHelper.getAverageExpensesByCategory().get(0).getAverageAmount());
         Log.d("mytag",""+dbHelper.getAverageExpensesByCategory().get(0).getCategoryName());
         Log.d("mytag",""+dbHelper.getAverageExpensesByCategory().get(0).getCategoryId());
+        }
+
 
     }
 }

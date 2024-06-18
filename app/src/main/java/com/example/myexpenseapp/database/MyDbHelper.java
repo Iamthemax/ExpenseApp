@@ -18,7 +18,6 @@ public class MyDbHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "ExpenseManager.db";
-
     // Table Names
     private static final String TABLE_EXPENSE = "expense";
     private static final String TABLE_CATEGORY = "category";
@@ -27,22 +26,23 @@ public class MyDbHelper extends SQLiteOpenHelper {
     private static final String COLUMN_IS_DELETED = "is_deleted";
 
     // Category Table Columns
-    private static final String COLUMN_CATEGORY_ID = "category_id";
+    private static final String COLUMN_CATEGORY_ID = "id";
     private static final String COLUMN_CATEGORY_NAME = "category_name";
 
     // Expense Table Columns
-    private static final String COLUMN_EXPENSE_ID = "expense_id";
-    private static final String COLUMN_EXPENSE_NAME = "expense_name";
-    private static final String COLUMN_EXPENSE_DATE = "expense_date";
-    private static final String COLUMN_EXPENSE_AMOUNT = "expense_amount";
-    private static final String COLUMN_EXPENSE_CATEGORY_ID = "category_id";
+    private static final String COLUMN_EXPENSE_ID = "id";
+    private static final String COLUMN_EXPENSE_NAME = "name";
+    private static final String COLUMN_EXPENSE_DATE = "date";
+    private static final String COLUMN_EXPENSE_AMOUNT = "amount";
+    private static final String COLUMN_EXPENSE_CATEGORY_ID = "categoryId";
+    private static final String COLUMN_EXPENSE_CATEGORY_NAME = "categoryName";
 
     private static final String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY + "("
             + COLUMN_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_CATEGORY_NAME + " TEXT NOT NULL, "
             + COLUMN_IS_DELETED + " INTEGER DEFAULT 0);";
 
-    private static final String COLUMN_EXPENSE_CATEGORY_NAME ="category_name" ;
+
     // Create Expense Table
     private static final String CREATE_TABLE_EXPENSE = "CREATE TABLE " + TABLE_EXPENSE + "("
             + COLUMN_EXPENSE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -52,10 +52,13 @@ public class MyDbHelper extends SQLiteOpenHelper {
             + COLUMN_EXPENSE_CATEGORY_ID + " INTEGER, "
             + COLUMN_EXPENSE_CATEGORY_NAME + " TEXT NOT NULL, "
             + COLUMN_IS_DELETED + " INTEGER DEFAULT 0"
-            +  ");";
+            + ");";
+
 
     public MyDbHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, 1);
+        Log.d("`mytag",CREATE_TABLE_EXPENSE);
+        Log.d("`mytag",CREATE_TABLE_CATEGORY);
     }
 
     @Override
@@ -63,43 +66,45 @@ public class MyDbHelper extends SQLiteOpenHelper {
 
         db.execSQL(CREATE_TABLE_EXPENSE);
         db.execSQL(CREATE_TABLE_CATEGORY);
-       // insertCategory("Default");
+        // insertCategory("Default");
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXPENSE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
         // Create tables again
-       // onCreate(db);
+        // onCreate(db);
     }
-    public long insertCategory(String categoryName)
-    {   SQLiteDatabase sqLiteDatabase=this.getWritableDatabase();
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(COLUMN_CATEGORY_NAME,categoryName);
-        long id=sqLiteDatabase.insert(TABLE_CATEGORY,null,contentValues);
+
+    public long insertCategory(String categoryName) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_CATEGORY_NAME, categoryName);
+        long id = sqLiteDatabase.insert(TABLE_CATEGORY, null, contentValues);
         return id;
     }
-    public long insertExpense(Expense expense)
-    {
-        SQLiteDatabase sqLiteDatabase=this.getWritableDatabase();
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(COLUMN_EXPENSE_CATEGORY_NAME,expense.getCategoryName());
-        contentValues.put(COLUMN_EXPENSE_CATEGORY_ID,expense.getCategoryId());
-        contentValues.put(COLUMN_EXPENSE_AMOUNT,expense.getAmount());
-        contentValues.put(COLUMN_EXPENSE_NAME,expense.getName());
-        contentValues.put(COLUMN_EXPENSE_DATE,expense.getDate());
-        long id=sqLiteDatabase.insert(TABLE_EXPENSE,null,contentValues);
+
+    public long insertExpense(Expense expense) {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_EXPENSE_CATEGORY_NAME, expense.getCategoryName());
+        contentValues.put(COLUMN_EXPENSE_CATEGORY_ID, expense.getCategoryId());
+        contentValues.put(COLUMN_EXPENSE_AMOUNT, expense.getAmount());
+        contentValues.put(COLUMN_EXPENSE_NAME, expense.getName());
+        contentValues.put(COLUMN_EXPENSE_DATE, expense.getDate());
+        long id = sqLiteDatabase.insert(TABLE_EXPENSE, null, contentValues);
         return id;
     }
-    public ArrayList<Expense> getAllExpenses(){
-        ArrayList<Expense> list=new ArrayList<>();
-        SQLiteDatabase database=this.getReadableDatabase();
-        Cursor cursor=database.rawQuery("SELECT * FROM "+TABLE_EXPENSE+" WHERE "+COLUMN_IS_DELETED+"=0 ORDER BY expense_id DESC ",null);
-        if(cursor.moveToFirst())
-        {
+
+    public ArrayList<Expense> getAllExpenses() {
+        ArrayList<Expense> list = new ArrayList<>();
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_EXPENSE + " WHERE " + COLUMN_IS_DELETED + "=0 ORDER BY id  DESC ", null);
+        if (cursor.moveToFirst()) {
             do {
-                Expense expense=new Expense();
+                Expense expense = new Expense();
                 expense.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_NAME)));
                 expense.setDate(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_DATE)));
                 expense.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_EXPENSE_ID)));
@@ -107,37 +112,37 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 expense.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_ID)));
                 expense.setCategoryName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_NAME)));
                 list.add(expense);
-            }while (cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
-        Log.d("mytag",""+list.size());
-        return list;
-    }
-    public ArrayList<Category> getAllCategories(){
-        ArrayList<Category> list=new ArrayList<>();
-        SQLiteDatabase database=this.getReadableDatabase();
-        Cursor cursor=database.rawQuery("SELECT * FROM "+TABLE_CATEGORY+" WHERE "+COLUMN_IS_DELETED+"=0 ORDER BY category_id DESC ",null);
-        if(cursor.moveToFirst())
-        {
-            do {
-                Category category=new Category();
-                category.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_NAME)));
-                category.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_ID)));
-                list.add(category);
-            }while (cursor.moveToNext());
-        }
-        Log.d("mytag",""+list.size());
+        Log.d("mytag", "" + list.size());
         return list;
     }
 
-    public double getSum(){
-        SQLiteDatabase database=this.getReadableDatabase();
-        Cursor cursor=database.rawQuery("SELECT SUM(expense_amount) FROM "+TABLE_EXPENSE+" WHERE "+COLUMN_IS_DELETED+"=0",null);
-        if(cursor.moveToFirst())
-        {
-          return cursor.getDouble(0);
+    public ArrayList<Category> getAllCategories() {
+        ArrayList<Category> list = new ArrayList<>();
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_CATEGORY + " WHERE " + COLUMN_IS_DELETED + "=0 ORDER BY id DESC ", null);
+        if (cursor.moveToFirst()) {
+            do {
+                Category category = new Category();
+                category.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_NAME)));
+                category.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_ID)));
+                list.add(category);
+            } while (cursor.moveToNext());
+        }
+        Log.d("mytag", "" + list.size());
+        return list;
+    }
+
+    public double getSum() {
+        SQLiteDatabase database = this.getReadableDatabase();
+        Cursor cursor = database.rawQuery("SELECT SUM(amount) FROM " + TABLE_EXPENSE + " WHERE " + COLUMN_IS_DELETED + "=0", null);
+        if (cursor.moveToFirst()) {
+            return cursor.getDouble(0);
         }
         return 0;
     }
+
     public ArrayList<CategoryAverage> getAverageExpensesByCategory() {
         ArrayList<CategoryAverage> list = new ArrayList<>();
         SQLiteDatabase database = this.getReadableDatabase();
@@ -182,6 +187,7 @@ public class MyDbHelper extends SQLiteOpenHelper {
             return averageAmount;
         }
     }
+
     public ArrayList<CategoryWeeklyExpense> getWeeklyCategoryExpenses() {
         ArrayList<CategoryWeeklyExpense> list = new ArrayList<>();
         SQLiteDatabase database = this.getReadableDatabase();
